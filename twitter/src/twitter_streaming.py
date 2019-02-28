@@ -31,8 +31,6 @@ def main():
     auth.set_access_token(access_token, access_token_secret)
 
     print("Streaming tweets now ...")
-    print("Number of tweets = ")
-    count = 0;
     stream = Stream(auth, MyListener(), tweet_mode = 'extended')
     stream.filter(track=['farmers market', 'farmersmarket', '#farmers market', '#FarmersMarket'])
     return
