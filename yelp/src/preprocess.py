@@ -27,7 +27,7 @@ def lemmatize(sen_tok):
     return new_tok
 
 def stem(sen_tok):
-    stemmer = nltk.stem.SnowballStemmer()
+    stemmer = nltk.stem.SnowballStemmer("english")
     new_tok = []
     for word in sen_tok:
         new_tok.append(stemmer.stem(word))
