@@ -26,6 +26,13 @@ def lemmatize(sen_tok):
         new_tok.append(lemmatizer.lemmatize(word, pos='v'))
     return new_tok
 
+def stem(sen_tok):
+    stemmer = nltk.stem.SnowballStemmer()
+    new_tok = []
+    for word in sen_tok:
+        new_tok.append(stemmer.stem(word))
+    return new_tok
+
 def remove_stopwords(sen_tok):
     new_tok = []
     for word in sen_tok:
@@ -41,4 +48,5 @@ def preprocess(sen):
     sen_tok = replace_numbers(sen_tok)
     sen_tok = remove_stopwords(sen_tok)
     sen_tok = lemmatize(sen_tok)
+    sen_tok = stem(sen_tok)
     return ' '.join(word for word in sen_tok)
