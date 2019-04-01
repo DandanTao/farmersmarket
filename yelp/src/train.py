@@ -39,6 +39,7 @@ def parse_csv(file):
     # drop all sentences with label 'covinience'
     # df = df.replace('covinience', 'convenience')
     df = df[df.Label != 'covinience']
+    df = df[df.Label != 'safety']
 
     train, test = train_test_split(df, test_size=0.2)
     return train.to_numpy(), test.to_numpy()
