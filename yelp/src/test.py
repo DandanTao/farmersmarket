@@ -10,8 +10,8 @@ def runSVC(train, tests):
     Wrapper function that uses training Support Vector Machine model to classify tests data
     """
     pipe = SVCModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = [x[1] for x in tests]
+    pred_data = pipe.predict([x[0].rstrip() for x in tests])
+    test_data = np.array([x[1].rstrip() for x in tests])
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -25,15 +25,15 @@ def runSVC(train, tests):
     # print ("SVC Recall:", recall)
     # print ("SVC Precision:", precision)
 
-    return metrics
+    return metrics, pred_data, test_data
 
 def runLSVC(train, tests):
     """
     Wrapper function that uses training Support Vector Machine model to classify tests data
     """
     pipe = LSVCModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = [x[1] for x in tests]
+    pred_data = pipe.predict([x[0].rstrip() for x in tests])
+    test_data = np.array([x[1].rstrip() for x in tests])
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -47,15 +47,15 @@ def runLSVC(train, tests):
     # print ("SVC Recall:", recall)
     # print ("SVC Precision:", precision)
 
-    return metrics
+    return metrics, pred_data, test_data
 
 def runLR(train, tests):
     """
     Wrapper function that uses training Support Vector Machine model to classify tests data
     """
     pipe = LogisticRegressionModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = [x[1] for x in tests]
+    pred_data = pipe.predict([x[0].rstrip() for x in tests])
+    test_data = np.array([x[1].rstrip() for x in tests])
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -69,15 +69,15 @@ def runLR(train, tests):
     # print ("SVC Recall:", recall)
     # print ("SVC Precision:", precision)
 
-    return metrics
+    return metrics, pred_data, test_data
 
 def runMNB(train, tests):
     """
     Wrapper function that uses training Multinomial Naive Bayes model to classify tests data
     """
     pipe = MultinomialNBModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = [x[1] for x in tests]
+    pred_data = pipe.predict([x[0].rstrip() for x in tests])
+    test_data = np.array([x[1].rstrip() for x in tests])
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -91,16 +91,15 @@ def runMNB(train, tests):
     # print ("MNB Recall:", recall)
     # print ("MNB Precision:", precision)
 
-    return metrics
+    return metrics, pred_data, test_data
 
 def runSGD(train, tests):
     """
     Wrapper function that uses training Stochastic Gradient Descent model to classify tests data
     """
     pipe = SGDModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-
-    test_data = [x[1] for x in tests]
+    pred_data = pipe.predict([x[0].rstrip() for x in tests])
+    test_data = np.array([x[1].rstrip() for x in tests])
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -114,15 +113,15 @@ def runSGD(train, tests):
     # print ("SGD Recall:", recall)
     # print ("SGD Precision:", precision)
 
-    return metrics
+    return metrics, pred_data, test_data
 
 def runCNB(train, tests):
     """
     Wrapper function that uses training Complement Naive Bayes model to classify tests data
     """
     pipe = ComplementNBModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = [x[1] for x in tests]
+    pred_data = pipe.predict([x[0].rstrip() for x in tests])
+    test_data = np.array([x[1].rstrip() for x in tests])
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -136,15 +135,15 @@ def runCNB(train, tests):
     # print ("CNB Recall:", recall)
     # print ("CNB Precision:", precision)
 
-    return metrics
+    return metrics, pred_data, test_data
 
 def runBNB(train, tests):
     """
     Wrapper function that uses training Bernoulli Naive Bayes model to classify tests data
     """
     pipe = BernoulliNBModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = [x[1] for x in tests]
+    pred_data = pipe.predict([x[0].rstrip() for x in tests])
+    test_data = np.array([x[1].rstrip() for x in tests])
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -158,10 +157,10 @@ def runBNB(train, tests):
     # print ("BNB Recall:", recall)
     # print ("BNB Precision:", precision)
 
-    return metrics
+    return metrics, pred_data, test_data
 
-def main():
-    num_iter = 50
+def main(n_iter=50):
+    num_iter = n_iter
     sgd = np.zeros(4)
     svc = np.zeros(4)
     lsvc = np.zeros(4)
@@ -192,5 +191,3 @@ def main():
 
     print(f"{sgd}\n{svc}\n{lsvc}\n{mnb}\n{cnb}\n{bnb}")
     analyze(sgd, svc, lsvc, lr, mnb, cnb, bnb)
-if __name__ == '__main__':
-    main()

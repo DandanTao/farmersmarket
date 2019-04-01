@@ -29,11 +29,16 @@ def parse_csv(file):
     """
     import pandas as pd
     df = pd.read_csv(file)
+
     df.drop(["Index", "Unnamed: 5", "Notes", "Words"], axis=1, inplace=True)
     df=df.fillna("None")
 
     # drop all sentence with multiple labels
-    # df=df[~df.Label.str.contains(",")]
+    df=df[~df.Label.str.contains(",")]
+
+    # drop all sentences with label 'covinience'
+    # df = df.replace('covinience', 'convenience')
+    df = df[df.Label != 'covinience']
 
     train, test = train_test_split(df, test_size=0.2)
     return train.to_numpy(), test.to_numpy()
