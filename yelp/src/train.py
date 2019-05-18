@@ -19,6 +19,7 @@ from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS as stopword
 from sklearn.model_selection import train_test_split
 
 import numpy as np
+import pandas as pd
 
 punctuations = string.punctuation
 parser = spacy.load('en')
@@ -34,6 +35,21 @@ def remove_white_space(dataframe):
     for index, row in dataframe.iterrows():
         row['Label'] = row['Label'].rstrip().lstrip()
     return dataframe
+
+def parse_csv_by_class(file):
+    df = pd.read_csv(file)
+    df.drop(["Index", "Unnamed: 5", "Notes", "Words"], axis=1, inplace=True)
+    df=df.fillna("Non-relevant")
+    df = df[df.Label != 'covinience']
+    df = df[df.Label != 'safety?']
+
+    df_aval = df[df.Label.str.contains('availability')]
+    df_environ = df[df.Label.str.contains('environment')]
+    df_quality = df[df.Label.str.contains('quality')]
+    df_safety = df[df.Label.str.contains('safety')]
+    df_nonrel = df[df.Label == "Non-relevant"]
+
+    return (df_aval, df_environ, df_quality, df_safety, df_nonrel)
 
 def parse_csv_relevant_non_relevant(file):
     """

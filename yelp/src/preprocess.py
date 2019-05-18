@@ -50,3 +50,11 @@ def preprocess(sen):
     sen_tok = lemmatize(sen_tok)
     sen_tok = stem(sen_tok)
     return ' '.join(word for word in sen_tok)
+
+def preprocessTFIDF(sen):
+    sen = sen.lower()
+    sen = remove_punctuation(sen)
+    sen_tok = nltk.word_tokenize(sen)
+    sen_tok = lemmatize(sen_tok)
+    sen_tok = stem(sen_tok)
+    return ' '.join(word for word in sen_tok)
