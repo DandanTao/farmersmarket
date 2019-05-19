@@ -10,8 +10,6 @@ def main():
     Combines all reviews into one file to analyze each review
     by sentences.
     """
-
-
     os.chdir(PATH)
     all_rev = []
     for filename in os.listdir(os.getcwd()):

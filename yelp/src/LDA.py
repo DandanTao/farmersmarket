@@ -2,7 +2,6 @@
 Refered code from
 https://github.com/susanli2016/NLP-with-Python/blob/master/LDA_news_headlines.ipynb
 """
-
 import gensim
 from gensim.utils import simple_preprocess
 from gensim.parsing.preprocessing import STOPWORDS
@@ -13,7 +12,6 @@ import nltk
 import pandas as pd
 from pprint import pprint
 from gensim import corpora, models
-
 
 def lemmatize_stemming(text):
     return SnowballStemmer('english').stem(WordNetLemmatizer().lemmatize(text, pos='v'))

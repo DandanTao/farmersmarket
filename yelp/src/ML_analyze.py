@@ -13,16 +13,9 @@ def analyze(SGD_metrics, LSVC_metrics, LR_metrics, CNB_metrics):
     opacity = 0.8
 
     sgd_bar = plt.bar(index, SGD_metrics, bar_width, alpha=opacity, color='b', label='SGD')
-
     lsvc_bar = plt.bar(index + bar_width, LSVC_metrics, bar_width, alpha=opacity, color='k', label='LSVC')
-
     lr_bar = plt.bar(index + bar_width * 2, LR_metrics, bar_width, alpha=opacity, color='m', label='LR')
-    #
-    # mnb_bar = plt.bar(index + bar_width * 3, MNB_metrics, bar_width, alpha=opacity, color='r', label='MNB')
-
     cnb_bar = plt.bar(index + bar_width * 3, CNB_metrics, bar_width, alpha=opacity, color='c', label='CNB')
-    #
-    # bnb_bar = plt.bar(index + bar_width * 5, BNB_metrics, bar_width, alpha=opacity, color='y', label='BNB')
 
     plt.ylim(0, 1)
     plt.ylabel('Scores')
