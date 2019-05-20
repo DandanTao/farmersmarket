@@ -196,7 +196,7 @@ def LogisticRegressionModel(data):
 
     vectorizer = CountVectorizer(tokenizer = spacy_tokenizer, ngram_range=(1,1))
 
-    classifier = LogisticRegression(random_state=0)
+    classifier = LogisticRegression(random_state=0, multi_class="multinomial", solver="newton-cg")
 
     # apply predictors(), vectorizer (transforms) and final estimator(classifier)
     pipe = Pipeline([("cleaner", predictors()),

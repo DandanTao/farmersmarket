@@ -15,9 +15,13 @@ def parse_csv_by_class(file):
     df=remove_white_space(df)
 
     df_aval = df[df.Label.str.contains('availability')]
+    df_aval[:]['Label'] = 'availability'
     df_environ = df[df.Label.str.contains('environment')]
+    df_environ[:]['Label'] = 'environment'
     df_quality = df[df.Label.str.contains('quality')]
+    df_quality[:]['Label'] = 'quality'
     df_safety = df[df.Label.str.contains('safety')]
+    df_safety[:]['Label'] = 'safety'
     df_nonrel = df[df.Label == "Non-relevant"]
 
     return (df_aval, df_environ, df_quality, df_safety, df_nonrel)
@@ -92,3 +96,4 @@ def random_test_data(file, size=0.2):
     df=remove_white_space(df)
     _, test = train_test_split(df, test_size=size)
     return test
+parse_csv_by_class("../data/yelp_labelling_1000.csv")
