@@ -159,10 +159,11 @@ def runTFIDFRuleBase(file_path, test):
         all_sc = [aval_sc, environ_sc, qual_sc, safety_sc, nonrel_sc]
         max_sc = max(all_sc)
         if max_sc == 0:
-            continue
-
+            predLabel = 'Non-relevant'
+        else:
+            predLabel = idx_to_Label[all_sc.index(max_sc)]
         trueLabel = row["Label"]
-        predLabel = idx_to_Label[all_sc.index(max_sc)]
+
         pred_label.append(predLabel)
         true_label.append(trueLabel)
 

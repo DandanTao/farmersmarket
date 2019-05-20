@@ -48,7 +48,7 @@ def parse_csv_remove_multiclass(file):
 
     df.drop(["Index", "Unnamed: 5", "Notes", "Words"], axis=1, inplace=True)
     df=df.fillna("None")
-    df = remove_whparserite_space(df)
+    df = remove_white_space(df)
     # drop all sentence with multiple labels
     df=df[~df.Label.str.contains(",")]
 

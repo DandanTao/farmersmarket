@@ -254,7 +254,7 @@ def main():
     run_all(cross_val=iter,
             analyze_metrics=True,
             confusion_matrix=True,
-            parser=parse_csv_relevant_non_relevant)
+            parser=parse_csv_remove_multiclass)
 
 if __name__ == '__main__':
     main()
