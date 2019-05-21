@@ -2,11 +2,36 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 def remove_white_space(dataframe):
-    for index, row in dataframe.iterrows():
-        row['Label'] = row['Label'].rstrip().lstrip()
+    try:
+        for index, row in dataframe.iterrows():
+            row['Label'] = row['Label'].rstrip().lstrip()
+    except:
+        for index, row in dataframe.iterrows():
+            row['True_Label'] = row['True_Label'].rstrip().lstrip()
     return dataframe
 
-def parse_csv_by_class(file):
+def parse_csv_by_class_two_file(file1, file2):
+    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v0(file1)
+    df_aval1, df_environ1, df_quality1, df_safety1, df_nonrel1 = parse_csv_by_class_v1(file2)
+    return (pd.concat([df_aval, df_aval1], sort=False),
+            pd.concat([df_environ, df_environ1], sort=False),
+            pd.concat([df_quality, df_quality1], sort=False),
+            pd.concat([df_safety, df_safety1], sort=False),
+            pd.concat([df_nonrel, df_nonrel1], sort=False))
+            
+def parse_csv_by_class_v1(file):
+    df = pd.read_csv(file)
+
+    df=remove_white_space(df)
+    df_aval = df[df.Label == 'availability']
+    df_environ = df[df.Label =='environment']
+    df_quality = df[df.Label =='quality']
+    df_safety = df[df.Label =='safety']
+    df_nonrel = df[df.Label == "Non-relevant"]
+
+    return (df_aval, df_environ, df_quality, df_safety, df_nonrel)
+
+def parse_csv_by_class_v0(file):
     df = pd.read_csv(file)
     df.drop(["Index", "Unnamed: 5", "Notes", "Words"], axis=1, inplace=True)
     df=df.fillna("Non-relevant")
@@ -26,6 +51,7 @@ def parse_csv_by_class(file):
 
     return (df_aval, df_environ, df_quality, df_safety, df_nonrel)
 
+parse_csv_by_class_two_file("../data/yelp_labelling_1000.csv","../data/1000_more_yelp.csv")
 def parse_csv_relevant_non_relevant(file):
     """
     reads csv file data with labels and comment
@@ -96,4 +122,9 @@ def random_test_data(file, size=0.2):
     df=remove_white_space(df)
     _, test = train_test_split(df, test_size=size)
     return test
-parse_csv_by_class("../data/yelp_labelling_1000.csv")
+
+def random_test_data_v1(file, size=0.2):
+    df = pd.read_csv(file)
+    df=remove_white_space(df)
+    _, test = train_test_split(df, test_size=size)
+    return test

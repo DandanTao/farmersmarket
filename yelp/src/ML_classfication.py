@@ -6,7 +6,10 @@ import warnings
 import numpy as np
 
 warnings.filterwarnings('ignore')
-PATH="../data/yelp_labelling_1000.csv"
+
+PATH1="../data/yelp_labelling_1000.csv"
+PATH2="../data/1000_more_yelp.csv"
+
 def runSVC(train, tests):
     """
     Wrapper function that uses training Support Vector Machine model to classify tests data
@@ -198,7 +201,13 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, parser=
     con_acc=0
     # Cross validation
     for i in range(0, num_iter):
-        train, test = parser(PATH)
+        # train, test = parser(PATH)
+        df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(PATH2)
+        df = pd.concat([df_aval, df_environ, df_quality, df_safety, df_nonrel])
+        train, test = train_test_split(df, test_size=0.2)
+        train = train.to_numpy()
+        test = test.to_numpy()
+
         sgd, sgd_p, sgd_r = runSGD(train, test)
         lsvc, lsvc_p, lsvc_r = runLSVC(train, test)
         # mnb, mnb_p, mnb_r = runMNB(train, test)

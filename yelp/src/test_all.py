@@ -1,24 +1,38 @@
 import pandas as pd
 import numpy as np
 from models import SGDModel, LogisticRegressionModel
-from csv_parser import parse_csv_by_class
+from csv_parser import parse_csv_by_class_two_file
 from RB_classification import getTFIDF, getCWScore
 from preprocess import preprocess
 import time
 from pprint import pprint
 import os
-
-TRAIN_FILE_PATH = "../data/yelp_labelling_1000.csv"
+import statistics
+TRAIN_FILE_PATH1 = "../data/yelp_labelling_1000.csv"
+TRAIN_FILE_PATH2 = "../data/1000_more_yelp.csv"
 TEST_FILE_PATH = "../data/separate_sentence.txt"
 
+def common(l):
+    return statistics.mode(l)
 
+def get_vote_pred(l1, l2, l3):
+    vote_pred = []
+    for x, y, z in zip(l1, l2, l3):
+        l = [x, y, z]
+        most_common = common(l)
+        if l.count(most_common) == 1:
+            vote_pred.append("N/A")
+        else:
+            vote_pred.append(most_common)
+    return vote_pred
 
-def testSGD10000(train_file, test_file):
+def test_all_methods(train_file1, train_file2, test_file):
     """
     train_file: csv file containing sentences and label
     test_file: plain text file with newline separated sentences
     """
-    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class(train_file)
+    df_aval, df_environ, df_quality, df_safety, df_nonrel \
+                    = parse_csv_by_class_two_file(train_file1, train_file2)
     frames = [df_aval, df_environ, df_quality, df_safety, df_nonrel]
     df_ML = pd.concat(frames)
 
@@ -26,7 +40,9 @@ def testSGD10000(train_file, test_file):
     with open(test_file) as f:
         for i, line in enumerate(f):
             test_sen.append(line.rstrip().lstrip())
-            
+            if i > 10:
+                break
+
     #==================================SGD=====================================#
     SGD_start = time.time()
     SGDPipe = SGDModel(df_ML.to_numpy())
@@ -66,10 +82,11 @@ def testSGD10000(train_file, test_file):
 
     print(f"TIME IT TOOK TO TRAIN {len(test_sen)} SENTENCES(sec): \
     \n\tSGD: {SGD_end-SGD_start}\n\tLR: {LR_end-LR_start}\n\tTFIDF: {TFIDF_end-TFIDF_start}")
-
-    res = {"Sentence":test_sen, "SGD_Pred":SGD_Pred, "LR_Pred":LR_Pred, "TFIDF_Pred":tfidf_pred}
+    vote_pred = get_vote_pred(SGD_Pred, LR_Pred, tfidf_pred)
+    print(vote_pred)
+    res = {"Sentences":test_sen, "SGD_Pred":SGD_Pred, "LR_Pred":LR_Pred, "TFIDF_Pred":tfidf_pred, "Vote_Pred":vote_pred}
     df = pd.DataFrame(data=res)
-    os.chdir("../data")
-    df.to_excel("all_reviews.xlsx", index=False)
+    print(df)
+    df.to_csv("../data/all_reviews_v1.csv", index=False)
 
-testSGD10000(TRAIN_FILE_PATH, TEST_FILE_PATH)
+test_all_methods(TRAIN_FILE_PATH1, TRAIN_FILE_PATH2, TEST_FILE_PATH)

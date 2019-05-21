@@ -15,7 +15,8 @@ import LDA
 
 import matplotlib.pyplot as plt
 
-PATH="../data/yelp_labelling_1000.csv"
+PATH1="../data/yelp_labelling_1000.csv"
+PATH2="../data/1000_more_yelp.csv"
 
 def wordCount(df, preprocessor):
     res = {}
@@ -32,12 +33,11 @@ def wordCount(df, preprocessor):
 def sortByValue(dict):
     return sorted(wordCount(dict, preprocess)[0].items(), key=lambda x: x[1], reverse=True)
 
-def wordCountRuleBase(file_path):
+def wordCountRuleBase(file_path1, file_path2):
     """
     BOG model
     """
-    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class(file_path)
-
+    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(file_path2)
     aval = sortByValue(df_aval)
     environ = sortByValue(df_environ)
     qual =  sortByValue(df_quality)
@@ -63,8 +63,8 @@ def getCWScore(TFDict, sen, preprocessor):
             sum += TFDict[word]
     return sum
 
-def runWordCountRuleBase(file_path, test, num_terms=20):
-    aval, environ, qual, safety, nonrel = wordCountRuleBase(file_path)
+def runWordCountRuleBase(file_path1, file_path2, test, num_terms=20):
+    aval, environ, qual, safety, nonrel = wordCountRuleBase(file_path1, file_path2)
     aval_dict = TFNormalize(aval, num_terms)
     environ_dict = TFNormalize(environ, num_terms)
     qual_dict = TFNormalize(qual, num_terms)
@@ -137,8 +137,8 @@ def getTFIDF(df):
     IDF = computeIDF(df)
     return computeTFIDF(TF, IDF)
 
-def runTFIDFRuleBase(file_path, test):
-    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class(file_path)
+def runTFIDFRuleBase(file_path1, file_path2, test):
+    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(file_path2)
     aval_TFIDF = getTFIDF(df_aval)
     environ_TFIDF = getTFIDF(df_environ)
     quality_TFIDF = getTFIDF(df_quality)
@@ -194,8 +194,8 @@ def getLDABOWModel(df, filter=True):
     bow_corpus = [dictionary.doc2bow(doc) for doc in processed_docs]
     return gensim.models.LdaMulticore(bow_corpus, num_topics=10, id2word=dictionary, passes=2, workers=2), dictionary
 
-def runLDARuleBase(file_path, test):
-    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class(file_path)
+def runLDARuleBase(file_path1, file_path2, test):
+    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_two_file(file_path1, file_path2)
 
     aval_lda_model, aval_dictionary = getLDABOWModel(df_aval, filter=True)
     environ_lda_model, environ_dictionary = getLDABOWModel(df_environ, filter=True)
@@ -261,16 +261,16 @@ def main():
     acc_tfidf = np.zeros(4)
     for i in range(iter):
         print(f"EPOCH {i+1}")
-        test = random_test_data(PATH, size=0.4)
-        bow_metrics, bow_true, bow_pred = runWordCountRuleBase(PATH, test, num_terms=20)
-        tfidf_metrics, tfidf_true, tfidf_pred = runTFIDFRuleBase(PATH, test)
+        test = random_test_data_v1(PATH2, size=0.4)
+        bow_metrics, bow_true, bow_pred = runWordCountRuleBase(PATH1, PATH2, test, num_terms=20)
+        tfidf_metrics, tfidf_true, tfidf_pred = runTFIDFRuleBase(PATH1, PATH2, test)
 
         all_bow_true = merge_list(all_bow_true, bow_true)
         all_bow_pred = merge_list(all_bow_pred, bow_pred)
 
         all_tfidf_true = merge_list(all_tfidf_true, tfidf_true)
         all_tfidf_pred = merge_list(all_tfidf_pred, tfidf_pred)
-        # runLDARuleBase(PATH, test)
+        # runLDARuleBase(PATH1, PATH2, test)
 
         acc_bow += bow_metrics
         acc_tfidf += tfidf_metrics
