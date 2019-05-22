@@ -15,8 +15,11 @@ def runSVC(train, tests):
     Wrapper function that uses training Support Vector Machine model to classify tests data
     """
     pipe = SVCModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = np.array([x[1].rstrip() for x in tests])
+    # pred_data = pipe.predict([x[0] for x in tests])
+    # test_data = np.array([x[1].rstrip() for x in tests])
+
+    pred_data = pipe.predict(tests.Sentences)
+    test_data = tests.Label
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -37,8 +40,11 @@ def runLSVC(train, tests):
     Wrapper function that uses training Support Vector Machine model to classify tests data
     """
     pipe = LSVCModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = np.array([x[1].rstrip() for x in tests])
+    # pred_data = pipe.predict([x[0] for x in tests])
+    # test_data = np.array([x[1].rstrip() for x in tests])
+
+    pred_data = pipe.predict(tests.Sentences)
+    test_data = tests.Label
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -59,8 +65,11 @@ def runLR(train, tests):
     Wrapper function that uses training Support Vector Machine model to classify tests data
     """
     pipe = LogisticRegressionModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = np.array([x[1].rstrip() for x in tests])
+    # pred_data = pipe.predict([x[0] for x in tests])
+    # test_data = np.array([x[1].rstrip() for x in tests])
+
+    pred_data = pipe.predict(tests.Sentences)
+    test_data = tests.Label
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -81,8 +90,11 @@ def runMNB(train, tests):
     Wrapper function that uses training Multinomial Naive Bayes model to classify tests data
     """
     pipe = MultinomialNBModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = np.array([x[1].rstrip() for x in tests])
+    # pred_data = pipe.predict([x[0] for x in tests])
+    # test_data = np.array([x[1].rstrip() for x in tests])
+
+    pred_data = pipe.predict(tests.Sentences)
+    test_data = tests.Label
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -103,9 +115,11 @@ def runSGD(train, tests):
     Wrapper function that uses training Stochastic Gradient Descent model to classify tests data
     """
     pipe = SGDModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = np.array([x[1].rstrip() for x in tests])
+    # pred_data = pipe.predict([x[0] for x in tests])
+    # test_data = np.array([x[1].rstrip() for x in tests])
 
+    pred_data = pipe.predict(tests.Sentences)
+    test_data = tests.Label
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
     recall = recall_score(test_data, pred_data, average='weighted')
@@ -125,9 +139,11 @@ def runCNB(train, tests):
     Wrapper function that uses training Complement Naive Bayes model to classify tests data
     """
     pipe = ComplementNBModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = np.array([x[1].rstrip() for x in tests])
+    # pred_data = pipe.predict([x[0] for x in tests])
+    # test_data = np.array([x[1].rstrip() for x in tests])
 
+    pred_data = pipe.predict(tests.Sentences)
+    test_data = tests.Label
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
     recall = recall_score(test_data, pred_data, average='weighted')
@@ -147,8 +163,10 @@ def runBNB(train, tests):
     Wrapper function that uses training Bernoulli Naive Bayes model to classify tests data
     """
     pipe = BernoulliNBModel(train)
-    pred_data = pipe.predict([x[0] for x in tests])
-    test_data = np.array([x[1].rstrip() for x in tests])
+    #pred_data = pipe.predict([x[0] for x in tests])
+    # test_data = np.array([x[1].rstrip() for x in tests])
+    pred_data = pipe.predict(tests.Sentences)
+    test_data = tests.Label
 
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
@@ -205,8 +223,8 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, parser=
         df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(PATH2)
         df = pd.concat([df_aval, df_environ, df_quality, df_safety, df_nonrel])
         train, test = train_test_split(df, test_size=0.2)
-        train = train.to_numpy()
-        test = test.to_numpy()
+        # train = train.to_numpy()
+        # test = test.to_numpy()
 
         sgd, sgd_p, sgd_r = runSGD(train, test)
         lsvc, lsvc_p, lsvc_r = runLSVC(train, test)

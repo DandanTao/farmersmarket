@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from models import SGDModel, LogisticRegressionModel
-from csv_parser import parse_csv_by_class_two_file
+from csv_parser import parse_csv_by_class_v1, parse_csv_by_class_v0
 from RB_classification import getTFIDF, getCWScore
 from preprocess import preprocess
 import time
@@ -19,20 +19,20 @@ def get_vote_pred(l1, l2, l3):
     vote_pred = []
     for x, y, z in zip(l1, l2, l3):
         l = [x, y, z]
-        most_common = common(l)
-        if l.count(most_common) == 1:
-            vote_pred.append("N/A")
-        else:
-            vote_pred.append(most_common)
+        try:
+            most_common = common(l)
+        except:
+            most_common = "N/A"
+        vote_pred.append(most_common)
     return vote_pred
 
-def test_all_methods(train_file1, train_file2, test_file):
+def test_all_methods(train_file, test_file, parser=parse_csv_by_class_v1):
     """
     train_file: csv file containing sentences and label
     test_file: plain text file with newline separated sentences
     """
     df_aval, df_environ, df_quality, df_safety, df_nonrel \
-                    = parse_csv_by_class_two_file(train_file1, train_file2)
+                    = parser(train_file)
     frames = [df_aval, df_environ, df_quality, df_safety, df_nonrel]
     df_ML = pd.concat(frames)
 
@@ -45,13 +45,13 @@ def test_all_methods(train_file1, train_file2, test_file):
 
     #==================================SGD=====================================#
     SGD_start = time.time()
-    SGDPipe = SGDModel(df_ML.to_numpy())
+    SGDPipe = SGDModel(df_ML)
     SGD_Pred = SGDPipe.predict(test_sen)
     SGD_end = time.time()
 
     #===================================LR=====================================#
     LR_start = time.time()
-    LRPipe = LogisticRegressionModel(df_ML.to_numpy())
+    LRPipe = LogisticRegressionModel(df_ML)
     LR_Pred = LRPipe.predict(test_sen)
     LR_end = time.time()
 
@@ -83,10 +83,10 @@ def test_all_methods(train_file1, train_file2, test_file):
     print(f"TIME IT TOOK TO TRAIN {len(test_sen)} SENTENCES(sec): \
     \n\tSGD: {SGD_end-SGD_start}\n\tLR: {LR_end-LR_start}\n\tTFIDF: {TFIDF_end-TFIDF_start}")
     vote_pred = get_vote_pred(SGD_Pred, LR_Pred, tfidf_pred)
-    print(vote_pred)
+    # print(vote_pred)
     res = {"Sentences":test_sen, "SGD_Pred":SGD_Pred, "LR_Pred":LR_Pred, "TFIDF_Pred":tfidf_pred, "Vote_Pred":vote_pred}
     df = pd.DataFrame(data=res)
-    print(df)
+    # print(df)
     df.to_csv("../data/all_reviews_v1.csv", index=False)
 
-test_all_methods(TRAIN_FILE_PATH1, TRAIN_FILE_PATH2, TEST_FILE_PATH)
+test_all_methods(TRAIN_FILE_PATH1, TEST_FILE_PATH, parser=parse_csv_by_class_v0)

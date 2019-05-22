@@ -64,8 +64,8 @@ def SVCModel(data):
                      ('classifier', classifier)])
 
     # Load sample data
-    pipe.fit([x[0] for x in data], [x[1] for x in data])
-
+    # pipe.fit([x[0] for x in data], [x[1] for x in data])
+    pipe.fit(data.Sentences, data.Label)
     return pipe
 
 def MultinomialNBModel(data):
@@ -85,7 +85,8 @@ def MultinomialNBModel(data):
     # X_train_counts = count_vect.fit_transform(features)
     # X_train_tfidf = TfidfTransformer().fit_transform(X_train_counts)
 
-    pipe.fit([x[0] for x in data], [x[1] for x in data])
+    # pipe.fit([x[0] for x in data], [x[1] for x in data])
+    pipe.fit(data.Sentences, data.Label)
     return pipe
 def BernoulliNBModel(data):
     """
@@ -104,7 +105,8 @@ def BernoulliNBModel(data):
     # X_train_counts = count_vect.fit_transform(features)
     # X_train_tfidf = TfidfTransformer().fit_transform(X_train_counts)
 
-    pipe.fit([x[0] for x in data], [x[1] for x in data])
+    # pipe.fit([x[0] for x in data], [x[1] for x in data])
+    pipe.fit(data.Sentences, data.Label)
     return pipe
 
 def ComplementNBModel(data):
@@ -124,7 +126,8 @@ def ComplementNBModel(data):
     # X_train_counts = count_vect.fit_transform(features)
     # X_train_tfidf = TfidfTransformer().fit_transform(X_train_counts)
 
-    pipe.fit([x[0] for x in data], [x[1] for x in data])
+    # pipe.fit([x[0] for x in data], [x[1] for x in data])
+    pipe.fit(data.Sentences, data.Label)
     return pipe
 
 def SGDModel(data):
@@ -138,7 +141,8 @@ def SGDModel(data):
                     ('tfidf', TfidfTransformer()),
                     ('classifier', classifier)])
 
-    pipe.fit([x[0] for x in data], [x[1] for x in data])
+    # pipe.fit([x[0] for x in data], [x[1] for x in data])
+    pipe.fit(data.Sentences, data.Label)
     return pipe
 
 def LSVCModel(data):
@@ -167,8 +171,8 @@ def LSVCModel(data):
                      ('classifier', classifier)])
 
     # Load sample data
-    pipe.fit([x[0] for x in data], [x[1] for x in data])
-
+    #pipe.fit([x[0] for x in data], [x[1] for x in data])
+    pipe.fit(data.Sentences, data.Label)
     return pipe
 
 def LogisticRegressionModel(data):
@@ -204,6 +208,6 @@ def LogisticRegressionModel(data):
                      ('classifier', classifier)])
 
     # Load sample data
-    pipe.fit([x[0] for x in data], [x[1] for x in data])
-
+    # pipe.fit([x[0] for x in data], [x[1] for x in data])
+    pipe.fit(data.Sentences, data.Label)
     return pipe
