@@ -64,7 +64,6 @@ def SVCModel(data):
                      ('classifier', classifier)])
 
     # Load sample data
-    # pipe.fit([x[0] for x in data], [x[1] for x in data])
     pipe.fit(data.Sentences, data.Label)
     return pipe
 
@@ -79,13 +78,6 @@ def MultinomialNBModel(data):
                     ('tfidf', TfidfTransformer()),
                     ('classifier', MultinomialNB())])
 
-    # f = tfidf.fit_transform(np.array(features)).toarray()
-    # mnb = snb.MultinomialNB()
-    # count_vect = CountVectorizer()
-    # X_train_counts = count_vect.fit_transform(features)
-    # X_train_tfidf = TfidfTransformer().fit_transform(X_train_counts)
-
-    # pipe.fit([x[0] for x in data], [x[1] for x in data])
     pipe.fit(data.Sentences, data.Label)
     return pipe
 def BernoulliNBModel(data):
@@ -99,13 +91,6 @@ def BernoulliNBModel(data):
                     ('tfidf', TfidfTransformer()),
                     ('classifier', BernoulliNB())])
 
-    # f = tfidf.fit_transform(np.array(features)).toarray()
-    # mnb = snb.MultinomialNB()
-    # count_vect = CountVectorizer()
-    # X_train_counts = count_vect.fit_transform(features)
-    # X_train_tfidf = TfidfTransformer().fit_transform(X_train_counts)
-
-    # pipe.fit([x[0] for x in data], [x[1] for x in data])
     pipe.fit(data.Sentences, data.Label)
     return pipe
 
@@ -120,13 +105,6 @@ def ComplementNBModel(data):
                     ('tfidf', TfidfTransformer()),
                     ('classifier', ComplementNB())])
 
-    # f = tfidf.fit_transform(np.array(features)).toarray()
-    # mnb = snb.MultinomialNB()
-    # count_vect = CountVectorizer()
-    # X_train_counts = count_vect.fit_transform(features)
-    # X_train_tfidf = TfidfTransformer().fit_transform(X_train_counts)
-
-    # pipe.fit([x[0] for x in data], [x[1] for x in data])
     pipe.fit(data.Sentences, data.Label)
     return pipe
 
@@ -141,7 +119,6 @@ def SGDModel(data):
                     ('tfidf', TfidfTransformer()),
                     ('classifier', classifier)])
 
-    # pipe.fit([x[0] for x in data], [x[1] for x in data])
     pipe.fit(data.Sentences, data.Label)
     return pipe
 
@@ -191,7 +168,7 @@ def LogisticRegressionModel(data):
         def clean_text(self, text):
             return text.strip().lower()
 
-    #tokenizer to parse sentence, removing stopwords, removing punctuations and generate tokens using Spacy used for CountVectorizer()
+    # tokenizer to parse sentence, removing stopwords, removing punctuations and generate tokens using Spacy used for CountVectorizer()
     def spacy_tokenizer(sentence):
         tokens = spacy_parser(sentence)
         tokens = [tok.lemma_.lower().strip() if tok.lemma_ != "-PRON-" else tok.lower_ for tok in tokens]
@@ -208,6 +185,5 @@ def LogisticRegressionModel(data):
                      ('classifier', classifier)])
 
     # Load sample data
-    # pipe.fit([x[0] for x in data], [x[1] for x in data])
     pipe.fit(data.Sentences, data.Label)
     return pipe

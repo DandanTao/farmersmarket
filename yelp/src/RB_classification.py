@@ -19,6 +19,10 @@ PATH1="../data/yelp_labelling_1000.csv"
 PATH2="../data/1000_more_yelp.csv"
 
 def wordCount(df, preprocessor):
+    """
+    Preprocesses document and returns a dictinary of
+    {word:word_count | for all word in preprocessed document}
+    """
     res = {}
     count = 0
     for row in df.iterrows():
@@ -31,21 +35,30 @@ def wordCount(df, preprocessor):
     return (res, count)
 
 def sortByValue(dict):
+    """
+    Returns a list of tuple that is sorted by value
+    """
     return sorted(wordCount(dict, preprocess)[0].items(), key=lambda x: x[1], reverse=True)
 
-def wordCountRuleBase(file_path1, file_path2):
+def wordCountRuleBase(file_path):
     """
     BOG model
     """
-    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(file_path2)
+    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(file_path)
+
     aval = sortByValue(df_aval)
     environ = sortByValue(df_environ)
     qual =  sortByValue(df_quality)
     safety = sortByValue(df_safety)
     nonrel = sortByValue(df_nonrel)
+
     return (aval, environ, qual, safety, nonrel)
 
 def TFNormalize(wordcount, num_terms):
+    """
+    Preprocesses document and returns a dictinary of
+    {word:word_count/total_word_count | for all word in preprocessed document}
+    """
     res = {}
     total = 0
 
@@ -57,14 +70,21 @@ def TFNormalize(wordcount, num_terms):
     return res
 
 def getCWScore(TFDict, sen, preprocessor):
+    """
+    Given a sentence(@param sen), it computes the score of the preprocessed
+    sen using the TF score.
+    """
     sum = 0
     for word in preprocessor(sen).split(" "):
         if word in TFDict:
             sum += TFDict[word]
     return sum
 
-def runWordCountRuleBase(file_path1, file_path2, test, num_terms=20):
-    aval, environ, qual, safety, nonrel = wordCountRuleBase(file_path1, file_path2)
+def runWordCountRuleBase(file_path, test, num_terms=20):
+    """
+    Classic rule based classification only using term frequency
+    """
+    aval, environ, qual, safety, nonrel = wordCountRuleBase(file_path)
     aval_dict = TFNormalize(aval, num_terms)
     environ_dict = TFNormalize(environ, num_terms)
     qual_dict = TFNormalize(qual, num_terms)
@@ -101,12 +121,18 @@ def runWordCountRuleBase(file_path1, file_path2, test, num_terms=20):
     return np.array(metrics), true_label, pred_label
 
 def computeTF(df):
+    """
+    Computes term frequency in docs
+    """
     dict, count = wordCount(df, preprocessTFIDF)
     for k, v in dict.items():
         dict[k] /= count
     return dict
 
 def computeIDF(df):
+    """
+    Computes inverse document frequency in docs
+    """
     N = len(df)
     words = set()
     all_sen = []
@@ -127,18 +153,27 @@ def computeIDF(df):
     return res
 
 def computeTFIDF(TF, IDF):
+    """
+    Computes the TFIDF of a docuemnt for each word
+    """
     res = {}
     for k, v in TF.items():
         res[k] = v * IDF[k]
     return res
 
 def getTFIDF(df):
+    """
+    Returns a dictionary of {word:tfidf_score | for all word in document}
+    """
     TF = computeTF(df)
     IDF = computeIDF(df)
     return computeTFIDF(TF, IDF)
 
-def runTFIDFRuleBase(file_path1, file_path2, test):
-    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(file_path2)
+def runTFIDFRuleBase(file_path, test):
+    """
+    Deterministic rule based classification using TFIDF
+    """
+    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(file_path)
     aval_TFIDF = getTFIDF(df_aval)
     environ_TFIDF = getTFIDF(df_environ)
     quality_TFIDF = getTFIDF(df_quality)
@@ -177,6 +212,9 @@ def runTFIDFRuleBase(file_path1, file_path2, test):
     return np.array(metrics), true_label, pred_label
 
 def getLDATFIDFModel(df, filter=True):
+    """
+    LDA Topic Modeling model using TFIDF
+    """
     processed_docs = df["Sentences"].map(LDA.preprocess)
     dictionary = gensim.corpora.Dictionary(processed_docs)
     if filter:
@@ -187,6 +225,9 @@ def getLDATFIDFModel(df, filter=True):
     return gensim.models.LdaMulticore(corpus_tfidf, num_topics=10, id2word=dictionary, passes=2, workers=4), dictionary
 
 def getLDABOWModel(df, filter=True):
+    """
+    LDA Topic Modeling model using Bag Of Words
+    """
     processed_docs = df["Sentences"].map(LDA.preprocess)
     dictionary = gensim.corpora.Dictionary(processed_docs)
     if filter:
@@ -194,8 +235,11 @@ def getLDABOWModel(df, filter=True):
     bow_corpus = [dictionary.doc2bow(doc) for doc in processed_docs]
     return gensim.models.LdaMulticore(bow_corpus, num_topics=10, id2word=dictionary, passes=2, workers=2), dictionary
 
-def runLDARuleBase(file_path1, file_path2, test):
-    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_two_file(file_path1, file_path2)
+def runLDARuleBase(file_path, test):
+    """
+    Text classification using LDA topic modeling
+    """
+    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(file_path)
 
     aval_lda_model, aval_dictionary = getLDABOWModel(df_aval, filter=True)
     environ_lda_model, environ_dictionary = getLDABOWModel(df_environ, filter=True)
@@ -239,6 +283,9 @@ def runLDARuleBase(file_path1, file_path2, test):
     return (bow_correct / count, tfidf_correct / count)
 
 def merge_list(m1, m2):
+    """
+    merge two list
+    """
     for x in m2:
         m1.append(x)
     return m1
@@ -262,15 +309,15 @@ def main():
     for i in range(iter):
         print(f"EPOCH {i+1}")
         test = random_test_data_v1(PATH2, size=0.4)
-        bow_metrics, bow_true, bow_pred = runWordCountRuleBase(PATH1, PATH2, test, num_terms=20)
-        tfidf_metrics, tfidf_true, tfidf_pred = runTFIDFRuleBase(PATH1, PATH2, test)
+        bow_metrics, bow_true, bow_pred = runWordCountRuleBase(PATH2, test, num_terms=20)
+        tfidf_metrics, tfidf_true, tfidf_pred = runTFIDFRuleBase(PATH2, test)
 
         all_bow_true = merge_list(all_bow_true, bow_true)
         all_bow_pred = merge_list(all_bow_pred, bow_pred)
 
         all_tfidf_true = merge_list(all_tfidf_true, tfidf_true)
         all_tfidf_pred = merge_list(all_tfidf_pred, tfidf_pred)
-        # runLDARuleBase(PATH1, PATH2, test)
+        # runLDARuleBase(PATH2, test)
 
         acc_bow += bow_metrics
         acc_tfidf += tfidf_metrics

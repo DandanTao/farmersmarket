@@ -15,8 +15,6 @@ def runSVC(train, tests):
     Wrapper function that uses training Support Vector Machine model to classify tests data
     """
     pipe = SVCModel(train)
-    # pred_data = pipe.predict([x[0] for x in tests])
-    # test_data = np.array([x[1].rstrip() for x in tests])
 
     pred_data = pipe.predict(tests.Sentences)
     test_data = tests.Label
@@ -40,8 +38,6 @@ def runLSVC(train, tests):
     Wrapper function that uses training Support Vector Machine model to classify tests data
     """
     pipe = LSVCModel(train)
-    # pred_data = pipe.predict([x[0] for x in tests])
-    # test_data = np.array([x[1].rstrip() for x in tests])
 
     pred_data = pipe.predict(tests.Sentences)
     test_data = tests.Label
@@ -90,8 +86,6 @@ def runMNB(train, tests):
     Wrapper function that uses training Multinomial Naive Bayes model to classify tests data
     """
     pipe = MultinomialNBModel(train)
-    # pred_data = pipe.predict([x[0] for x in tests])
-    # test_data = np.array([x[1].rstrip() for x in tests])
 
     pred_data = pipe.predict(tests.Sentences)
     test_data = tests.Label
@@ -115,11 +109,10 @@ def runSGD(train, tests):
     Wrapper function that uses training Stochastic Gradient Descent model to classify tests data
     """
     pipe = SGDModel(train)
-    # pred_data = pipe.predict([x[0] for x in tests])
-    # test_data = np.array([x[1].rstrip() for x in tests])
 
     pred_data = pipe.predict(tests.Sentences)
     test_data = tests.Label
+
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
     recall = recall_score(test_data, pred_data, average='weighted')
@@ -144,6 +137,7 @@ def runCNB(train, tests):
 
     pred_data = pipe.predict(tests.Sentences)
     test_data = tests.Label
+
     accuracy = accuracy_score(test_data, pred_data)
     f1 = f1_score(test_data, pred_data, average='weighted', labels=np.unique(pred_data))
     recall = recall_score(test_data, pred_data, average='weighted')
@@ -163,8 +157,7 @@ def runBNB(train, tests):
     Wrapper function that uses training Bernoulli Naive Bayes model to classify tests data
     """
     pipe = BernoulliNBModel(train)
-    #pred_data = pipe.predict([x[0] for x in tests])
-    # test_data = np.array([x[1].rstrip() for x in tests])
+
     pred_data = pipe.predict(tests.Sentences)
     test_data = tests.Label
 
@@ -191,8 +184,7 @@ def consensus(lists_of_predict):
         c.append(max(d,key=d.count))
     return np.array(c)
 
-
-def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, parser=parse_csv_relevant_non_relevant):
+def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False):
     num_iter = cross_val
     sgd_a = np.zeros(4)
     lsvc_a = np.zeros(4)
@@ -221,10 +213,19 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, parser=
     for i in range(0, num_iter):
         # train, test = parser(PATH)
         df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(PATH2)
-        df = pd.concat([df_aval, df_environ, df_quality, df_safety, df_nonrel])
-        train, test = train_test_split(df, test_size=0.2)
-        # train = train.to_numpy()
-        # test = test.to_numpy()
+
+        train1, test1 = train_test_split(df_aval, test_size=0.2)
+        train2, test2 = train_test_split(df_environ, test_size=0.2)
+        train3, test3 = train_test_split(df_quality, test_size=0.2)
+        train4, test4 = train_test_split(df_safety, test_size=0.2)
+        train5, test5 = train_test_split(df_nonrel, test_size=0.2)
+
+        # df = pd.concat([df_aval, df_environ, df_quality, df_safety, df_nonrel])
+        # train, test = train_test_split(df, test_size=0.2)
+        # print(df.Label.unique())
+
+        train=pd.concat([train1, train2, train3, train4, train5])
+        test=pd.concat([test1, test2, test3, test4, test5])
 
         sgd, sgd_p, sgd_r = runSGD(train, test)
         lsvc, lsvc_p, lsvc_r = runLSVC(train, test)
@@ -261,10 +262,9 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, parser=
     # bnb_a /= num_iter
     lr_a /= num_iter
 
-    print(accuracy_score(sgd_real, con_pred))
+    print(f"SGD {sgd_a}\nLSVC {lsvc_a}\nCNB {cnb_a} LR {lr_a}")
+
     if analyze_metrics:
-        # analyze(sgd_a, lsvc_a, lr_a, mnb_a, cnb_a, bnb_a)
-        print(f"SGD {sgd_a}\nLSVC {lsvc_a}\nCNB {cnb_a} LR {lr_a}")
         analyze(sgd_a, lsvc_a, lr_a, cnb_a)
     if confusion_matrix:
         pred = [sgd_pred, lsvc_pred, cnb_pred, lr_pred, con_pred]
@@ -280,8 +280,7 @@ def main():
 
     run_all(cross_val=iter,
             analyze_metrics=True,
-            confusion_matrix=True,
-            parser=parse_csv_remove_multiclass)
+            confusion_matrix=True)
 
 if __name__ == '__main__':
     main()
