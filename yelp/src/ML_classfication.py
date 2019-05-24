@@ -9,7 +9,7 @@ warnings.filterwarnings('ignore')
 
 PATH1="../data/yelp_labelling_1000.csv"
 PATH2="../data/1000_more_yelp.csv"
-
+PATH3="../data/2000_yelp_labeled.csv"
 def runSVC(train, tests):
     """
     Wrapper function that uses training Support Vector Machine model to classify tests data
@@ -184,7 +184,7 @@ def consensus(lists_of_predict):
         c.append(max(d,key=d.count))
     return np.array(c)
 
-def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False):
+def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, file_path=None):
     num_iter = cross_val
     sgd_a = np.zeros(4)
     lsvc_a = np.zeros(4)
@@ -212,7 +212,7 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False):
     # Cross validation
     for i in range(0, num_iter):
         # train, test = parser(PATH)
-        df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(PATH2)
+        df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(file_path)
 
         train1, test1 = train_test_split(df_aval, test_size=0.2)
         train2, test2 = train_test_split(df_environ, test_size=0.2)
@@ -280,7 +280,8 @@ def main():
 
     run_all(cross_val=iter,
             analyze_metrics=True,
-            confusion_matrix=True)
+            confusion_matrix=True,
+            file_path=PATH3)
 
 if __name__ == '__main__':
     main()

@@ -49,7 +49,6 @@ def parse_csv_by_class_v0(file):
 
     return (df_aval, df_environ, df_quality, df_safety, df_nonrel)
 
-parse_csv_by_class_two_file("../data/yelp_labelling_1000.csv","../data/1000_more_yelp.csv")
 def parse_csv_relevant_non_relevant(file):
     """
     reads csv file data with labels and comment
@@ -64,8 +63,7 @@ def parse_csv_relevant_non_relevant(file):
         if row['Label'] != 'Non-relevant':
             row['Label'] = 'relevant'
 
-    train, test = train_test_split(df, test_size=0.2)
-    return train, test
+    return train_test_split(df, test_size=0.2)
 
 def parse_csv_remove_multiclass(file):
     """
@@ -85,8 +83,7 @@ def parse_csv_remove_multiclass(file):
     df = df[df.Label != 'covinience']
     df = df[df.Label != 'safety?']
 
-    train, test = train_test_split(df, test_size=0.2)
-    return train, test
+    return train_test_split(df, test_size=0.2)
 
 def parse_csv_discard_non_relevant(file):
     """
@@ -108,8 +105,7 @@ def parse_csv_discard_non_relevant(file):
     df = df[df.Label != 'covinience']
     df = df[df.Label != 'safety?']
 
-    train, test = train_test_split(df, test_size=0.2)
-    return train, test
+    return train_test_split(df, test_size=0.2)
 
 def random_test_data(file, size=0.2):
     df = pd.read_csv(file)

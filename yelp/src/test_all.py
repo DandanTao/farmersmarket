@@ -10,6 +10,7 @@ import os
 import statistics
 TRAIN_FILE_PATH1 = "../data/yelp_labelling_1000.csv"
 TRAIN_FILE_PATH2 = "../data/1000_more_yelp.csv"
+TRAIN_FILE_PATH3 = "../data/2000_yelp_labeled.csv"
 TEST_FILE_PATH = "../data/separate_sentence.txt"
 
 def common(l):
@@ -40,8 +41,6 @@ def test_all_methods(train_file, test_file, parser=parse_csv_by_class_v1):
     with open(test_file) as f:
         for i, line in enumerate(f):
             test_sen.append(line.rstrip().lstrip())
-            if i > 10:
-                break
 
     #==================================SGD=====================================#
     SGD_start = time.time()
@@ -87,6 +86,6 @@ def test_all_methods(train_file, test_file, parser=parse_csv_by_class_v1):
     res = {"Sentences":test_sen, "SGD_Pred":SGD_Pred, "LR_Pred":LR_Pred, "TFIDF_Pred":tfidf_pred, "Vote_Pred":vote_pred}
     df = pd.DataFrame(data=res)
     # print(df)
-    df.to_csv("../data/all_reviews_v1.csv", index=False)
-
-test_all_methods(TRAIN_FILE_PATH1, TEST_FILE_PATH, parser=parse_csv_by_class_v0)
+    df.to_csv("../data/all_reviews_v2.csv", index=False)
+if __name__ == '__main__':
+    test_all_methods(TRAIN_FILE_PATH3, TEST_FILE_PATH, parser=parse_csv_by_class_v0)

@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 
 PATH1="../data/yelp_labelling_1000.csv"
 PATH2="../data/1000_more_yelp.csv"
+PATH3="../data/2000_yelp_labeled.csv"
 
 def wordCount(df, preprocessor):
     """
@@ -309,8 +310,8 @@ def main():
     for i in range(iter):
         print(f"EPOCH {i+1}")
         test = random_test_data_v1(PATH2, size=0.4)
-        bow_metrics, bow_true, bow_pred = runWordCountRuleBase(PATH2, test, num_terms=20)
-        tfidf_metrics, tfidf_true, tfidf_pred = runTFIDFRuleBase(PATH2, test)
+        bow_metrics, bow_true, bow_pred = runWordCountRuleBase(PATH3, test, num_terms=20)
+        tfidf_metrics, tfidf_true, tfidf_pred = runTFIDFRuleBase(PATH3, test)
 
         all_bow_true = merge_list(all_bow_true, bow_true)
         all_bow_pred = merge_list(all_bow_pred, bow_pred)
