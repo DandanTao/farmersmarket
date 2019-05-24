@@ -6,7 +6,8 @@ def remove_white_space(dataframe):
         try:
             row['Label'] = row['Label'].rstrip().lstrip()
         except:
-            pass
+            print(index)
+            print(row['Label'])
     return dataframe
 
 def parse_csv_by_class_two_file(file1, file2):

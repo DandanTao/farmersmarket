@@ -273,6 +273,7 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, file_pa
         for p, r, t in zip(pred, real, titles):
             plot_confusion_matrix(p, r, normalize=True, title=t+" Confusion Matrix", cmap=plt.cm.Reds)
             plt.show()
+    return (sgd_a, lsvc_a, lr_a, cnb_a)
 
 def main():
     import sys

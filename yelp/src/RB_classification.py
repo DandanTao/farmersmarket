@@ -291,13 +291,11 @@ def merge_list(m1, m2):
         m1.append(x)
     return m1
 
-def main():
+def run_all(iter, file_path):
     bow = []
     tfidf = []
     bow_lda = []
     tfidf_lda = []
-    import sys
-    iter = 1 if len(sys.argv) == 1 else int(sys.argv[1])
 
     all_bow_true = []
     all_bow_pred = []
@@ -309,9 +307,9 @@ def main():
     acc_tfidf = np.zeros(4)
     for i in range(iter):
         print(f"EPOCH {i+1}")
-        test = random_test_data_v1(PATH2, size=0.4)
-        bow_metrics, bow_true, bow_pred = runWordCountRuleBase(PATH3, test, num_terms=20)
-        tfidf_metrics, tfidf_true, tfidf_pred = runTFIDFRuleBase(PATH3, test)
+        test = random_test_data_v1(file_path, size=0.4)
+        bow_metrics, bow_true, bow_pred = runWordCountRuleBase(file_path, test, num_terms=100)
+        tfidf_metrics, tfidf_true, tfidf_pred = runTFIDFRuleBase(file_path, test)
 
         all_bow_true = merge_list(all_bow_true, bow_true)
         all_bow_pred = merge_list(all_bow_pred, bow_pred)
@@ -330,7 +328,8 @@ def main():
                               cmap=plt.cm.Blues)
 
     plt.show()
-
+    print(tfidf_true)
+    print(tfidf_pred)
     plot_confusion_matrix(all_tfidf_true, all_tfidf_pred,
                               normalize=True,
                               title="TFIDF Confusion Matrix",
@@ -342,5 +341,9 @@ def main():
     print(f"Bow Overall Stat[Accuracy, F1, Recall, Precision]: {list(acc_bow)}")
     print(f"TFIDF Overall Stat[Accuracy, F1, Recall, Precision]: {list(acc_tfidf)}")
 
+    return (acc_bow, acc_tfidf)
+
 if __name__ == '__main__':
-    main()
+    import sys
+    iter = 1 if len(sys.argv) == 1 else int(sys.argv[1])
+    run_all(iter, PATH3)
