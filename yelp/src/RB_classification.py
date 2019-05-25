@@ -92,7 +92,7 @@ def runWordCountRuleBase(file_path, test, num_terms=20):
     safety_dict = TFNormalize(safety, num_terms)
     nonrel_dict = TFNormalize(nonrel, num_terms)
 
-    idx_to_Label = {0:'availability', 1:'environment', 2:'quality', 3:'safety', 4:'Non-relevant'}
+    idx_to_Label = {0:'availability', 1:'environment', 2:'quality', 3:'safety', 4:'non-relevant'}
     count = 0
     correct = 0
     true_label = []
@@ -181,7 +181,7 @@ def runTFIDFRuleBase(file_path, test):
     safety_TFIDF = getTFIDF(df_safety)
     nonrel_TFIDF = getTFIDF(df_nonrel)
 
-    idx_to_Label = {0:'availability', 1:'environment', 2:'quality', 3:'safety', 4:'Non-relevant'}
+    idx_to_Label = {0:'availability', 1:'environment', 2:'quality', 3:'safety', 4:'non-relevant'}
     count = 0
     correct = 0
     true_label = []
@@ -195,7 +195,7 @@ def runTFIDFRuleBase(file_path, test):
         all_sc = [aval_sc, environ_sc, qual_sc, safety_sc, nonrel_sc]
         max_sc = max(all_sc)
         if max_sc == 0:
-            predLabel = 'Non-relevant'
+            predLabel = 'non-relevant'
         else:
             predLabel = idx_to_Label[all_sc.index(max_sc)]
         trueLabel = row["Label"]
@@ -254,7 +254,7 @@ def runLDARuleBase(file_path, test):
     safety_lda_model_tfidf, _ = getLDATFIDFModel(df_safety, filter=False)
     nonrel_lda_model_tfidf, _ = getLDATFIDFModel(df_nonrel, filter=True)
 
-    idx_to_Label = {0:'availability', 1:'environment', 2:'quality', 3:'safety', 4:'Non-relevant'}
+    idx_to_Label = {0:'availability', 1:'environment', 2:'quality', 3:'safety', 4:'non-relevant'}
     count = 0
     bow_correct = 0
     tfidf_correct = 0

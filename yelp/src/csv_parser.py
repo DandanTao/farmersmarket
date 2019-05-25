@@ -27,7 +27,7 @@ def parse_csv_by_class_v1(file):
     df_environ = df[df.Label =='environment']
     df_quality = df[df.Label =='quality']
     df_safety = df[df.Label =='safety']
-    df_nonrel = df[df.Label == "Non-relevant"]
+    df_nonrel = df[df.Label == "non-relevant"]
 
     return (df_aval, df_environ, df_quality, df_safety, df_nonrel)
 
@@ -36,7 +36,7 @@ def parse_csv_by_class_v0(file):
     df = df[df.Label != 'covinience']
     df = df[df.Label != 'safety?']
     df=remove_white_space(df)
-    df=df.fillna("Non-relevant")
+    df=df.fillna("non-relevant")
 
     df_aval = df[df.Label.str.contains('availability')]
     df_aval[:]['Label'] = 'availability'
@@ -46,22 +46,22 @@ def parse_csv_by_class_v0(file):
     df_quality[:]['Label'] = 'quality'
     df_safety = df[df.Label.str.contains('safety')]
     df_safety[:]['Label'] = 'safety'
-    df_nonrel = df[df.Label == "Non-relevant"]
+    df_nonrel = df[df.Label == "non-relevant"]
 
     return (df_aval, df_environ, df_quality, df_safety, df_nonrel)
 
 def parse_csv_relevant_non_relevant(file):
     """
     reads csv file data with labels and comment
-    Parse into 2 category: Relevant and Non-relevant
+    Parse into 2 category: Relevant and non-relevant
     """
     df = pd.read_csv(file)
 
     df.drop(["Index", "Unnamed: 5", "Notes", "Words"], axis=1, inplace=True)
-    df=df.fillna("Non-relevant")
+    df=df.fillna("non-relevant")
 
     for index, row in df.iterrows():
-        if row['Label'] != 'Non-relevant':
+        if row['Label'] != 'non-relevant':
             row['Label'] = 'relevant'
 
     return train_test_split(df, test_size=0.2)
@@ -111,7 +111,7 @@ def parse_csv_discard_non_relevant(file):
 def random_test_data(file, size=0.2):
     df = pd.read_csv(file)
     df.drop(["Index", "Unnamed: 5", "Notes", "Words"], axis=1, inplace=True)
-    df=df.fillna("Non-relevant")
+    df=df.fillna("non-relevant")
     df = df[df.Label != 'covinience']
     df = df[df.Label != 'safety?']
     df=remove_white_space(df)

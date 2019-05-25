@@ -61,7 +61,7 @@ def test_all_methods(train_file, test_file, parser=parse_csv_by_class_v1):
     quality_TFIDF = getTFIDF(df_quality)
     safety_TFIDF = getTFIDF(df_safety)
     nonrel_TFIDF = getTFIDF(df_nonrel)
-    idx_to_Label = {0:'availability', 1:'environment', 2:'quality', 3:'safety', 4:'Non-relevant'}
+    idx_to_Label = {0:'availability', 1:'environment', 2:'quality', 3:'safety', 4:'non-relevant'}
 
     tfidf_pred = []
     for sen in test_sen:
@@ -73,7 +73,7 @@ def test_all_methods(train_file, test_file, parser=parse_csv_by_class_v1):
         all_sc = [aval_sc, environ_sc, qual_sc, safety_sc, nonrel_sc]
         max_sc = max(all_sc)
         if max_sc == 0:
-            predLabel = 'Non-relevant'
+            predLabel = 'non-relevant'
         else:
             predLabel = idx_to_Label[all_sc.index(max_sc)]
         tfidf_pred.append(predLabel)

@@ -7,7 +7,10 @@ PATH3="../data/2000_yelp_labeled.csv"
 
 def draw_table(r1, r2, r3, r4, r5, r6):
     import matplotlib.pyplot as plt
-    bow, tfidf = RB_classification.run_all(iter, PATH3)
+
+
+def run_all_classifier(num_iter, file_path):
+    bow, tfidf = RB_classification.run_all(num_iter, file_path)
     sgd, lsvc, lr, cnb = ML_classification.run_all(cross_val=iter,
             analyze_metrics=True,
             confusion_matrix=True,

@@ -247,7 +247,6 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, file_pa
         cnb_pred = np.append(cnb_pred, cnb_p)
         # bnb_pred = np.append(bnb_pred, bnb_p)
         lr_pred = np.append(lr_pred, lr_p)
-        con_pred = np.append(con_pred, consensus([lsvc_p, cnb_p, lr_p]))
 
         sgd_real = np.append(sgd_real, sgd_r)
         lsvc_real = np.append(lsvc_real, lsvc_r)
@@ -267,13 +266,14 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, file_pa
     if analyze_metrics:
         analyze(sgd_a, lsvc_a, lr_a, cnb_a)
     if confusion_matrix:
-        pred = [sgd_pred, lsvc_pred, cnb_pred, lr_pred, con_pred]
-        real = [sgd_real, lsvc_real, cnb_real, lr_real, sgd_real]
-        titles = ["SGD Normalized", "LSVC Normalized", "CNB Normalized", "LR Normalized", "Consensus Normalized"]
+        pred = [sgd_pred, lsvc_pred, cnb_pred, lr_pred]
+        real = [sgd_real, lsvc_real, cnb_real, lr_real]
+        titles = ["SGD Normalized", "LSVC Normalized", "CNB Normalized", "LR Normalized"]
         for p, r, t in zip(pred, real, titles):
             plot_confusion_matrix(p, r, normalize=True, title=t+" Confusion Matrix", cmap=plt.cm.Reds)
             plt.show()
-    return (sgd_a, lsvc_a, lr_a, cnb_a)
+
+    return (sgd_a, lsvc_a, lr_a, cnb_a, sgd_pred, lr_pred) ## sgd_pred and lr_pred for vote
 
 def main():
     import sys
