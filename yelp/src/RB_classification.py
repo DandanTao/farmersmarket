@@ -291,7 +291,7 @@ def merge_list(m1, m2):
         m1.append(x)
     return m1
 
-def run_all(iter, file_path):
+def run_all(iter, file_path, test, confusion_matrix=False, bar_graph=False):
     bow = []
     tfidf = []
     bow_lda = []
@@ -307,7 +307,7 @@ def run_all(iter, file_path):
     acc_tfidf = np.zeros(4)
     for i in range(iter):
         print(f"EPOCH {i+1}")
-        test = random_test_data_v1(file_path, size=0.4)
+
         bow_metrics, bow_true, bow_pred = runWordCountRuleBase(file_path, test, num_terms=100)
         tfidf_metrics, tfidf_true, tfidf_pred = runTFIDFRuleBase(file_path, test)
 
@@ -321,29 +321,31 @@ def run_all(iter, file_path):
         acc_bow += bow_metrics
         acc_tfidf += tfidf_metrics
         print()
+    if confusion_matrix:
+        plot_confusion_matrix(all_bow_true, all_bow_pred,
+                                  normalize=True,
+                                  title="BOW Confusion Matrix",
+                                  cmap=plt.cm.Blues)
 
-    plot_confusion_matrix(all_bow_true, all_bow_pred,
-                              normalize=True,
-                              title="BOW Confusion Matrix",
-                              cmap=plt.cm.Blues)
-
-    plt.show()
-    print(tfidf_true)
-    print(tfidf_pred)
-    plot_confusion_matrix(all_tfidf_true, all_tfidf_pred,
-                              normalize=True,
-                              title="TFIDF Confusion Matrix",
-                              cmap=plt.cm.Blues)
-    plt.show()
+        plt.show()
+        # print(tfidf_true)
+        # print(tfidf_pred)
+        plot_confusion_matrix(all_tfidf_true, all_tfidf_pred,
+                                  normalize=True,
+                                  title="TFIDF Confusion Matrix",
+                                  cmap=plt.cm.Blues)
+        plt.show()
     acc_bow /= iter
     acc_tfidf /= iter
-    RB_bar_graph(acc_bow, acc_tfidf)
+    if bar_graph:
+        RB_bar_graph(acc_bow, acc_tfidf)
     print(f"Bow Overall Stat[Accuracy, F1, Recall, Precision]: {list(acc_bow)}")
     print(f"TFIDF Overall Stat[Accuracy, F1, Recall, Precision]: {list(acc_tfidf)}")
 
-    return (acc_bow, acc_tfidf)
+    return (acc_bow, acc_tfidf, all_bow_pred, all_tfidf_pred)
 
 if __name__ == '__main__':
     import sys
     iter = 1 if len(sys.argv) == 1 else int(sys.argv[1])
-    run_all(iter, PATH3)
+    test = random_test_data_v1(PATH3, size=0.4)
+    run_all(iter, PATH3, test, confusion_matrix=True, bar_graph=True)

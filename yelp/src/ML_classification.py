@@ -184,7 +184,7 @@ def consensus(lists_of_predict):
         c.append(max(d,key=d.count))
     return np.array(c)
 
-def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, file_path=None):
+def run_all(cross_val=10, train=None, test=None, analyze_metrics=False, confusion_matrix=False, file_path=None):
     num_iter = cross_val
     sgd_a = np.zeros(4)
     lsvc_a = np.zeros(4)
@@ -213,21 +213,6 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, file_pa
     for i in range(0, num_iter):
         print(f"EPOCH {i+1}")
         # train, test = parser(PATH)
-        df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(file_path)
-
-        train1, test1 = train_test_split(df_aval, test_size=0.2)
-        train2, test2 = train_test_split(df_environ, test_size=0.2)
-        train3, test3 = train_test_split(df_quality, test_size=0.2)
-        train4, test4 = train_test_split(df_safety, test_size=0.2)
-        train5, test5 = train_test_split(df_nonrel, test_size=0.2)
-
-        # df = pd.concat([df_aval, df_environ, df_quality, df_safety, df_nonrel])
-        # train, test = train_test_split(df, test_size=0.2)
-        # print(df.Label.unique())
-
-        train=pd.concat([train1, train2, train3, train4, train5])
-        test=pd.concat([test1, test2, test3, test4, test5])
-
         sgd, sgd_p, sgd_r = runSGD(train, test)
         lsvc, lsvc_p, lsvc_r = runLSVC(train, test)
         # mnb, mnb_p, mnb_r = runMNB(train, test)
@@ -251,7 +236,7 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, file_pa
 
         sgd_real = np.append(sgd_real, sgd_r)
         lsvc_real = np.append(lsvc_real, lsvc_r)
-        # mnb_real = np.append(mnb_real, mnb_r)
+        # mnb_real = np.append(mnb_real, trainmnb_r)
         cnb_real = np.append(cnb_real, cnb_r)
         # bnb_real = np.append(bnb_real, bnb_r)
         lr_real = np.append(lr_real, lr_r)
@@ -274,16 +259,26 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, file_pa
             plot_confusion_matrix(p, r, normalize=True, title=t+" Confusion Matrix", cmap=plt.cm.Reds)
             plt.show()
 
-    return (sgd_a, lsvc_a, lr_a, cnb_a, sgd_pred, lr_pred) ## sgd_pred and lr_pred for vote
+    return (sgd_a, lsvc_a, lr_a, cnb_a, sgd_pred, lsvc_pred, cnb_pred, lr_pred) # prediction data for vote
 
-def main():
+if __name__ == '__main__':
     import sys
     iter = 1 if len(sys.argv) == 1 else int(sys.argv[1])
+    df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(PATH3)
+    train1, test1 = train_test_split(df_aval, test_size=0.2)
+    train2, test2 = train_test_split(df_environ, test_size=0.2)
+    train3, test3 = train_test_split(df_quality, test_size=0.2)
+    train4, test4 = train_test_split(df_safety, test_size=0.2)
+    train5, test5 = train_test_split(df_nonrel, test_size=0.2)
+    # df = pd.concat([df_aval, df_environ, df_quality, df_safety, df_nonrel])
+    # train, test = train_test_split(df, test_size=0.2)
+    # print(df.Label.unique())
 
+    train=pd.concat([train1, train2, train3, train4, train5])
+    test=pd.concat([test1, test2, test3, test4, test5])
     run_all(cross_val=iter,
+            train=train,
+            test=test,
             analyze_metrics=True,
             confusion_matrix=True,
             file_path=PATH3)
-
-if __name__ == '__main__':
-    main()

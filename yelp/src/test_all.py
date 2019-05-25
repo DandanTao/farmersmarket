@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from models import SGDModel, LogisticRegressionModel
+from models import SGDModel, LogisticRegressionModel, LSVCModel
 from csv_parser import parse_csv_by_class_v1, parse_csv_by_class_v0
 from RB_classification import getTFIDF, getCWScore
 from preprocess import preprocess
@@ -16,14 +16,24 @@ TEST_FILE_PATH = "../data/separate_sentence.txt"
 def common(l):
     return statistics.mode(l)
 
-def get_vote_pred(l1, l2, l3):
+def tie_break(l):
+    sgd, lsvc, lr, tfidf = l
+    if tfidf == "safety":
+        return "safety"
+    else:
+        # TODO FIX TIE BREAK ALGORITHM
+        # if sgd == "environment" or sgd == "quality":
+        #     return sgd
+        return "N/A"
+
+def get_vote_pred(SGD_Pred, LSVC_Pred, LR_Pred, tfidf_pred):
     vote_pred = []
-    for x, y, z in zip(l1, l2, l3):
-        l = [x, y, z]
+    for sgd, lsvc, lr, tfidf in zip(SGD_Pred, LSVC_Pred, LR_Pred, tfidf_pred):
+        l = [sgd, lsvc, lr, tfidf]
         try:
             most_common = common(l)
         except:
-            most_common = "N/A"
+            most_common = tie_break(l)
         vote_pred.append(most_common)
     return vote_pred
 
@@ -54,6 +64,12 @@ def test_all_methods(train_file, test_file, parser=parse_csv_by_class_v1):
     LR_Pred = LRPipe.predict(test_sen)
     LR_end = time.time()
 
+    #=================================LSVC=====================================#
+    LSVC_start = time.time()
+    LSVCPipe = LSVCModel(df_ML)
+    LSVC_Pred = LRPipe.predict(test_sen)
+    LSVC_end = time.time()
+
     #=================================TFIDF====================================#
     TFIDF_start = time.time()
     aval_TFIDF = getTFIDF(df_aval)
@@ -80,12 +96,13 @@ def test_all_methods(train_file, test_file, parser=parse_csv_by_class_v1):
     TFIDF_end = time.time()
 
     print(f"TIME IT TOOK TO TRAIN {len(test_sen)} SENTENCES(sec): \
-    \n\tSGD: {SGD_end-SGD_start}\n\tLR: {LR_end-LR_start}\n\tTFIDF: {TFIDF_end-TFIDF_start}")
-    vote_pred = get_vote_pred(SGD_Pred, LR_Pred, tfidf_pred)
+    \n\tSGD: {SGD_end-SGD_start}\n\tLSVR: {LSVC_end-LSVC_start}\n\t LR: {LR_end-LR_start}\n\tTFIDF: {TFIDF_end-TFIDF_start}")
+    vote_pred = get_vote_pred(SGD_Pred, LSVC_Pred, LR_Pred, tfidf_pred)
     # print(vote_pred)
-    res = {"Sentences":test_sen, "SGD_Pred":SGD_Pred, "LR_Pred":LR_Pred, "TFIDF_Pred":tfidf_pred, "Vote_Pred":vote_pred}
+    res = {"Sentences":test_sen, "SGD_Pred":SGD_Pred, "LSVC_Pred": LSVC_Pred, "LR_Pred":LR_Pred, "TFIDF_Pred":tfidf_pred, "Vote_Pred":vote_pred}
     df = pd.DataFrame(data=res)
     # print(df)
     df.to_csv("../data/all_reviews_v2.csv", index=False)
+
 if __name__ == '__main__':
     test_all_methods(TRAIN_FILE_PATH3, TEST_FILE_PATH, parser=parse_csv_by_class_v0)
