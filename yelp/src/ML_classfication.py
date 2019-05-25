@@ -211,7 +211,7 @@ def run_all(cross_val=10, analyze_metrics=False, confusion_matrix=False, file_pa
     con_acc=0
     # Cross validation
     for i in range(0, num_iter):
-        print("EPOCH {}", i+1)
+        print(f"EPOCH {i+1}")
         # train, test = parser(PATH)
         df_aval, df_environ, df_quality, df_safety, df_nonrel = parse_csv_by_class_v1(file_path)
 
