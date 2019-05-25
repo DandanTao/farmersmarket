@@ -11,7 +11,17 @@ try:
     xls = pd.read_excel(excel_file)
     xls.dropna()
     filename = excel_file[:excel_file.rfind(".")]
-    xls.to_csv(filename+".csv", index=False)
+    sen=[]
+    lab=[]
+    for index, row in xls.iterrows():
+        s=row["Sentences"]
+        s=s.replace(";", "")
+        sen.append(s)
+        lab.append(row["Label"].lower())
+
+    as_csv = {"Sentences":sen, "Label":lab}
+    df = pd.DataFrame(data=as_csv)
+    df.to_csv(filename+".csv", index=False)
 except Exception as inst:
     print(type(inst))
     print(inst)
