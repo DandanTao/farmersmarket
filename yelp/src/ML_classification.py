@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from models import *
 from csv_parser import *
 from sklearn.metrics import accuracy_score, f1_score, recall_score, precision_score

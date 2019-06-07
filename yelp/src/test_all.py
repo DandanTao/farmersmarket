@@ -1,13 +1,15 @@
+#!/usr/bin/python3
 import pandas as pd
 import numpy as np
 from models import SGDModel, LogisticRegressionModel, LSVCModel
 from csv_parser import parse_csv_by_class_v1, parse_csv_by_class_v0
 from RB_classification import getTFIDF, getCWScore
-from preprocess import preprocess
+from preprocess import preprocess, clean_text
 import time
 from pprint import pprint
 import os
 import statistics
+from textblob import TextBlob
 TRAIN_FILE_PATH1 = "../data/yelp_labelling_1000.csv"
 TRAIN_FILE_PATH2 = "../data/1000_more_yelp.csv"
 TRAIN_FILE_PATH3 = "../data/2000_yelp_labeled.csv"
@@ -51,7 +53,6 @@ def test_all_methods(train_file, test_file, parser=parse_csv_by_class_v1):
     with open(test_file) as f:
         for i, line in enumerate(f):
             test_sen.append(line.rstrip().lstrip())
-
     #==================================SGD=====================================#
     SGD_start = time.time()
     SGDPipe = SGDModel(df_ML)
@@ -80,7 +81,15 @@ def test_all_methods(train_file, test_file, parser=parse_csv_by_class_v1):
     idx_to_Label = {0:'availability', 1:'environment', 2:'quality', 3:'safety', 4:'non-relevant'}
 
     tfidf_pred = []
+    polarity = []
     for sen in test_sen:
+        sentiment = TextBlob(clean_text(sen)).sentiment
+        pol = 0
+        if sentiment.polarity < 0:
+            pol = -1
+        elif sentiment.polarity > 0:
+            pol = 1
+        polarity.append(pol)
         aval_sc = getCWScore(aval_TFIDF, sen, preprocess)
         environ_sc = getCWScore(environ_TFIDF, sen, preprocess)
         qual_sc = getCWScore(quality_TFIDF, sen, preprocess)
@@ -95,14 +104,15 @@ def test_all_methods(train_file, test_file, parser=parse_csv_by_class_v1):
         tfidf_pred.append(predLabel)
     TFIDF_end = time.time()
 
-    print(f"TIME IT TOOK TO TRAIN {len(test_sen)} SENTENCES(sec): \
-    \n\tSGD: {SGD_end-SGD_start}\n\tLSVR: {LSVC_end-LSVC_start}\n\t LR: {LR_end-LR_start}\n\tTFIDF: {TFIDF_end-TFIDF_start}")
+    print(f"TIME IT TOOK TO TRAIN/TEST {len(test_sen)} SENTENCES(sec): \
+    \n\tSGD: {SGD_end-SGD_start}\n\tLSVR: {LSVC_end-LSVC_start}\n\tLR: {LR_end-LR_start}\n\tTFIDF: {TFIDF_end-TFIDF_start}")
     vote_pred = get_vote_pred(SGD_Pred, LSVC_Pred, LR_Pred, tfidf_pred)
     # print(vote_pred)
-    res = {"Sentences":test_sen, "SGD_Pred":SGD_Pred, "LSVC_Pred": LSVC_Pred, "LR_Pred":LR_Pred, "TFIDF_Pred":tfidf_pred, "Vote_Pred":vote_pred}
+    # test_sen = [sen.replace(";", ".") for sen in test_sen]
+    res = {"Sentences":test_sen, "SGD_Pred":SGD_Pred, "LSVC_Pred": LSVC_Pred, "LR_Pred":LR_Pred, "TFIDF_Pred":tfidf_pred, "Vote_Pred":vote_pred, "Polarity[-1, 1]":polarity}
     df = pd.DataFrame(data=res)
     # print(df)
-    df.to_csv("../data/all_reviews_v2.csv", index=False)
+    df.to_excel("../results/all_reviews.xlsx", index=False)
 
 if __name__ == '__main__':
     test_all_methods(TRAIN_FILE_PATH3, TEST_FILE_PATH, parser=parse_csv_by_class_v0)

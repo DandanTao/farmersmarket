@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from models import *
 from csv_parser import *
 from preprocess import preprocess, preprocessTFIDF

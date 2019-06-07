@@ -7,6 +7,9 @@ def remove_punctuation(sen):
     regex = re.compile("[{}]".format(re.escape(string.punctuation)))
     return regex.sub("", sen)
 
+def clean_text(sen):
+    return " ".join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t]) |(\w+:\/\/\S+)", " ", sen).split())
+    
 def replace_numbers(sen_tok):
     """Substitues numeric numbers to text"""
     p = inflect.engine()

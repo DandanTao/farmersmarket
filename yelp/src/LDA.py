@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Refered code from
 https://github.com/susanli2016/NLP-with-Python/blob/master/LDA_news_headlines.ipynb

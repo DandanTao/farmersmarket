@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import RB_classification
 import ML_classification
 from csv_parser import parse_csv_by_class_v1

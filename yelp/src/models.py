@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import string
 import spacy
 from copy import deepcopy as DP

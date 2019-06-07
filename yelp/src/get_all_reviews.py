@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import requests
 from pprint import pprint
 from bs4 import BeautifulSoup

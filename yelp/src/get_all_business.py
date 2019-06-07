@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import requests
 import API_KEY
 from pprint import pprint
