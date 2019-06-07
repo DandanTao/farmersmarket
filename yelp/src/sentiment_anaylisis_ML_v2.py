@@ -91,12 +91,12 @@ def main():
     sgd_list = []
     tfidf_list = []
     real_label = []
-
+    df_name = ['Availability', 'Environment', 'Quality', 'Safety']
     import sys
-    num_iter = int(sys.argv[1]) if len(sys.argv) > 1 else 1
+    num_iter = int(sys.argv[1]) if len(sys.argv) > 1 else 2
     for i in range(num_iter):
         print(i)
-        for df in frames:
+        for j, df in enumerate(frames):
             train, test = train_test_split(df, test_size=0.2)
 
             lsvc_metrics, lsvc_pred, label = run_ML(LSVCModel, train, test)
@@ -114,6 +114,8 @@ def main():
             lr_list = merge_list(lr_list, lr_pred)
             sgd_list = merge_list(sgd_list, sgd_pred)
             real_label = merge_list(real_label, label)
+
+            print(f"Label: {df_name[j]}\n\tLSVC {lsvc_metrics}\n\tLR {lr_metrics}\n\tSGD {sgd_metrics}\n\tTFIDF {tfidf_metrics}\n")\
 
     lsvc /= (4 * num_iter)
     lr /= (4 * num_iter)
