@@ -37,11 +37,11 @@ def runTFIDFRuleBase(file_path, train, test):
     """
     Deterministic rule based classification using TFIDF
     """
-    df_neu = train[train.Label == 0]
+    # df_neu = train[train.Label == 0]
     df_pos = train[train.Label == 1]
     df_neg = train[train.Label == -1]
 
-    neu_TFIDF = getTFIDF(df_neu)
+    # neu_TFIDF = getTFIDF(df_neu)
     pos_TFIDF = getTFIDF(df_pos)
     neg_TFIDF = getTFIDF(df_neg)
 
@@ -50,16 +50,16 @@ def runTFIDFRuleBase(file_path, train, test):
     true_label = []
     pred_label = []
     for idx, row in test.iterrows():
-        neu_sc = getCWScore(neu_TFIDF, row['Sentences'], preprocess)
+        # neu_sc = getCWScore(neu_TFIDF, row['Sentences'], preprocess)
         pos_sc = getCWScore(pos_TFIDF, row['Sentences'], preprocess)
         neg_sc = getCWScore(neg_TFIDF, row['Sentences'], preprocess)
 
-        all_sc = [neg_sc, neu_sc, pos_sc]
+        all_sc = [neg_sc, pos_sc]
         max_sc = max(all_sc)
         if max_sc == 0:
-            predLabel = 0
+            predLabel = 1
         else:
-            predLabel = all_sc.index(max_sc) - 1
+            predLabel = 1 if all_sc.index(max_sc) == 1 else -1
         trueLabel = row["Label"]
 
         pred_label.append(predLabel)
@@ -80,6 +80,8 @@ def merge_list(a, b):
 
 def main():
     frames = parse_excel_by_class(PATH)
+    for x in frames:
+        x.Label.replace(0, 1, inplace=True)
 
     lsvc = np.zeros(4)
     lr = np.zeros(4)
@@ -93,11 +95,16 @@ def main():
     real_label = []
     df_name = ['Availability', 'Environment', 'Quality', 'Safety']
     import sys
-    num_iter = int(sys.argv[1]) if len(sys.argv) > 1 else 2
+    num_iter = int(sys.argv[1]) if len(sys.argv) > 1 else 1
     for i in range(num_iter):
         print(i)
         for j, df in enumerate(frames):
-            train, test = train_test_split(df, test_size=0.2)
+            df = [train_test_split(x, test_size=0.2) for x in frames]
+            train = [x[0] for x in df]
+            test = [x[1] for x in df]
+
+            train = pd.concat(train)
+            test = pd.concat(test)
 
             lsvc_metrics, lsvc_pred, label = run_ML(LSVCModel, train, test)
             lr_metrics, lr_pred, _ = run_ML(LogisticRegressionModel, train, test)
@@ -123,17 +130,17 @@ def main():
     tfidf /= (4 * num_iter)
     print(f"LSVC {lsvc}\nLR {lr}\nSGD {sgd}\nTFIDF {tfidf}")
 
-    plot_confusion_matrix(real_label, lsvc_list, normalize=True, title="LSVC", cmap=plt.cm.Blues)
-    plt.show()
-
-    plot_confusion_matrix(real_label, lr_list, normalize=True, title="LR", cmap=plt.cm.Blues)
-    plt.show()
-
-    plot_confusion_matrix(real_label, sgd_list, normalize=True, title="SGD", cmap=plt.cm.Blues)
-    plt.show()
-
-    plot_confusion_matrix(real_label, tfidf_list, normalize=True, title="TFIDF", cmap=plt.cm.Blues)
-    plt.show()
+    # plot_confusion_matrix(real_label, lsvc_list, normalize=True, title="LSVC", cmap=plt.cm.Blues)
+    # plt.show()
+    #
+    # plot_confusion_matrix(real_label, lr_list, normalize=True, title="LR", cmap=plt.cm.Blues)
+    # plt.show()
+    #
+    # plot_confusion_matrix(real_label, sgd_list, normalize=True, title="SGD", cmap=plt.cm.Blues)
+    # plt.show()
+    #
+    # plot_confusion_matrix(real_label, tfidf_list, normalize=True, title="TFIDF", cmap=plt.cm.Blues)
+    # plt.show()
 
 if __name__ == '__main__':
     main()
