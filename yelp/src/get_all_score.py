@@ -25,7 +25,6 @@ QUAL = 'quality'
 SAFETY = 'safety'
 NON_REL = 'non-relevant'
 
-REVIEW_DIR = '/home/jaelee/farmersmarket/yelp/reviews_2019/'
 FM_INFO_DIR = '/home/jaelee/farmersmarket/yelp/data/farmers_market_2019.json'
 
 TRAIN_FILE_PATH = "../data/2000_yelp_labeled.csv"
@@ -34,6 +33,8 @@ class FM_info:
         self.name = dict['name']
         self.lat = dict['coordinates']['latitude']
         self.lng = dict['coordinates']['longitude']
+        self.num_reviews = dict['review_count']
+        self.overall = dict['rating']
 
     def __repr__(self):
         return f"{self.name} {self.lat} {self.lng}"
@@ -117,7 +118,7 @@ def scoreing_algorithm(overall, all_reviews):
         else:
             final_score.append(None)
 
-    while leftover > 0:
+    while leftover > 1:
         final_score, leftover = apply_leftover(final_score, leftover, all_reviews)
 
     print("DONE SCORING {}".format(final_score))
@@ -154,9 +155,9 @@ def TFIDF_predict(sentences, aval, environ, qual, safety, nonrel):
 
     return tfidf_pred
 
-def convert_info_to_dict(fm_info, overall, review_scores):
+def convert_info_to_dict(fm_info, review_scores):
     return {"Name": fm_info.name, "Long": fm_info.lng, "Lat": fm_info.lat,
-    "Overall":overall,"Availability":review_scores[0],"Environment":review_scores[1],
+    "num_reviews": fm_info.num_reviews,"Overall":fm_info.overall,"Availability":review_scores[0],"Environment":review_scores[1],
     "Quality": review_scores[2], "Safety": review_scores[3]}
 
 def get_overall_score(alias):
@@ -246,54 +247,50 @@ def get_all_score():
 
         alias = file.split(".txt")[0]
         if len(sentences) > 0:
-            count, overall = get_overall_score(alias)
-            if overall >= 5.0:
-                scores = [5.0] * 4
-                info = convert_info_to_dict(aliasToLoc[alias], 5.0, scores)
-                res["Farmers_Market"].append(info)
-            else:
-                avail = []
-                environ = []
-                qual = []
-                safety = []
+            fm = aliasToLoc[alias]
+            count, overall = fm.num_reviews, fm.overall
+            avail = []
+            environ = []
+            qual = []
+            safety = []
 
-                SGD_Pred = SGDPipe.predict(sentences)
-                LR_Pred = LRPipe.predict(sentences)
-                LSVC_Pred = LRPipe.predict(sentences)
-                TFIDF_Pred = TFIDF_predict(sentences, aval_TFIDF, environ_TFIDF,
-                quality_TFIDF, safety_TFIDF, nonrel_TFIDF)
+            SGD_Pred = SGDPipe.predict(sentences)
+            LR_Pred = LRPipe.predict(sentences)
+            LSVC_Pred = LRPipe.predict(sentences)
+            TFIDF_Pred = TFIDF_predict(sentences, aval_TFIDF, environ_TFIDF,
+            quality_TFIDF, safety_TFIDF, nonrel_TFIDF)
 
-                vote_pred = get_vote_pred(SGD_Pred, LSVC_Pred, LR_Pred, TFIDF_Pred)
-                for sen, label in zip(sentences, vote_pred):
-                    if label == AVAIL:
-                        avail.append(sen)
-                    elif label == ENVIRON:
-                        environ.append(sen)
-                    elif label == QUAL:
-                        qual.append(sen)
-                    elif label == SAFETY:
-                        safety.append(sen)
+            vote_pred = get_vote_pred(SGD_Pred, LSVC_Pred, LR_Pred, TFIDF_Pred)
+            for sen, label in zip(sentences, vote_pred):
+                if label == AVAIL:
+                    avail.append(sen)
+                elif label == ENVIRON:
+                    environ.append(sen)
+                elif label == QUAL:
+                    qual.append(sen)
+                elif label == SAFETY:
+                    safety.append(sen)
 
-                avail_sc = count_possitive_reviews(avail, AVAIL, avail_pos_TFIDF, avail_neg_TFIDF)
-                environ_sc = count_possitive_reviews(environ, ENVIRON, en_pos_TFIDF, en_neg_TFIDF)
-                qual_sc = count_possitive_reviews(qual, QUAL, qual_pos_TFIDF, qual_neg_TFIDF)
-                safety_sc = count_possitive_reviews(safety, SAFETY, safety_pos_TFIDF, safety_neg_TFIDF)
-                all_reviews = [avail_sc, environ_sc, qual_sc, safety_sc]
-                review_scores = scoreing_algorithm(overall, all_reviews)
+            avail_sc = count_possitive_reviews(avail, AVAIL, avail_pos_TFIDF, avail_neg_TFIDF)
+            environ_sc = count_possitive_reviews(environ, ENVIRON, en_pos_TFIDF, en_neg_TFIDF)
+            qual_sc = count_possitive_reviews(qual, QUAL, qual_pos_TFIDF, qual_neg_TFIDF)
+            safety_sc = count_possitive_reviews(safety, SAFETY, safety_pos_TFIDF, safety_neg_TFIDF)
+            all_reviews = [avail_sc, environ_sc, qual_sc, safety_sc]
+            review_scores = scoreing_algorithm(overall, all_reviews)
 
-                round_scores = []
-                for x in review_scores:
-                    if x is not None:
-                        round_scores.append(round(x, 1))
-                    else:
-                        round_scores.append(None)
+            round_scores = []
+            for x in review_scores:
+                if x is not None:
+                    round_scores.append(round(x, 1))
+                else:
+                    round_scores.append(None)
 
-                info = convert_info_to_dict(aliasToLoc[alias], overall, round_scores)
-                res["Farmers_Market"].append(info)
+            info = convert_info_to_dict(aliasToLoc[alias], round_scores)
+            res["Farmers_Market"].append(info)
 
         else:
             scores = [None] * 4
-            info = convert_info_to_dict(aliasToLoc[alias], None, scores)
+            info = convert_info_to_dict(aliasToLoc[alias], scores)
             res["Farmers_Market"].append(info)
 
     with open("all_result.json", 'w') as f:
