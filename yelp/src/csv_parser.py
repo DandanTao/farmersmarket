@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 import pandas as pd
 from sklearn.model_selection import train_test_split
+import re
+import nltk.stem
 
 def remove_white_space(dataframe):
     for index, row in dataframe.iterrows():
@@ -20,9 +22,25 @@ def parse_csv_by_class_two_file(file1, file2):
             pd.concat([df_safety, df_safety1], sort=False),
             pd.concat([df_nonrel, df_nonrel1], sort=False))
 
+def lemmatize(sen_tok):
+    lemmatizer = nltk.stem.WordNetLemmatizer()
+    new_tok = []
+    for word in sen_tok:
+        new_tok.append(lemmatizer.lemmatize(word, pos='v'))
+    return ' '.join(new_tok)
+
+def replace_digit(sen):
+    return re.sub('\d', '', sen)
+
+def replace_digit_df(df):
+    for i, content in enumerate(df.Sentences):
+        df.at[i, 'Sentences'] = replace_digit(content)
+
+    return df
+
 def parse_csv_by_class_v1(file):
     df = pd.read_csv(file)
-
+    df = replace_digit_df(df)
     df=remove_white_space(df)
     df_aval = df[df.Label == 'availability']
     df_environ = df[df.Label =='environment']

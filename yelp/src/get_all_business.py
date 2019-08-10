@@ -6,7 +6,7 @@ from pprint import pprint
 API_KEY = API_KEY.api_key
 DEFAULT_PATH = "https://api.yelp.com/v3/businesses/search"
 ZIP_FILE = "../datas/zip_code.txt"
-FM_DETAIL="farmers_market_2019.json"
+FM_DETAIL="farmers_market_2018.json"
 FM_ALIAS="farmers_market_2019_biz"
 QUERY_TERM = "farmers market"
 

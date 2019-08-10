@@ -25,12 +25,16 @@ QUAL = 'quality'
 SAFETY = 'safety'
 NON_REL = 'non-relevant'
 
-FM_INFO_DIR = '/home/jaelee/farmersmarket/yelp/data/farmers_market_2019.json'
+FM_INFO_DIR = '/Users/jaewooklee/farmers_market/yelp/data/all_FM_info.json'
 
 TRAIN_FILE_PATH = "../data/2000_yelp_labeled.csv"
+SEPARATE_SENTENCE_DIR = '/Users/jaewooklee/farmers_market/sentenceboundary/out/'
+
+FM_REV_PER_ASP_DIR = '/Users/jaewooklee/farmers_market/yelp/src/reviews_per_fm_per_aspect/'
 class FM_info:
     def __init__(self, dict):
         self.name = dict['name']
+        self.alias = dict['alias']
         self.lat = dict['coordinates']['latitude']
         self.lng = dict['coordinates']['longitude']
         self.num_reviews = dict['review_count']
@@ -158,7 +162,7 @@ def TFIDF_predict(sentences, aval, environ, qual, safety, nonrel):
 def convert_info_to_dict(fm_info, review_scores):
     return {"Name": fm_info.name, "Long": fm_info.lng, "Lat": fm_info.lat,
     "num_reviews": fm_info.num_reviews,"Overall":fm_info.overall,"Availability":review_scores[0],"Environment":review_scores[1],
-    "Quality": review_scores[2], "Safety": review_scores[3]}
+    "Quality": review_scores[2], "Safety": review_scores[3], 'Alias': fm_info.alias}
 
 def get_overall_score(alias):
     with open(REVIEW_DIR + alias + ".json") as f:
@@ -182,6 +186,11 @@ def count_possitive_reviews(reviews, label, pos_TFIDF, neg_TFIDF):
 
     return (positive, negative)
 
+def write_rev_per_asp(alias, aspect, revs):
+    with open(FM_REV_PER_ASP_DIR + alias + '_' + aspect + '.txt', 'w') as f:
+        for rev in revs:
+            f.write(rev)
+            f.write('\n')
 
 def get_all_score():
     df_aval, df_environ, df_quality, df_safety, df_nonrel \
@@ -202,7 +211,7 @@ def get_all_score():
 
     res = {"Farmers_Market":[]}
 
-    frames = parse_excel_by_class("/home/jaelee/farmersmarket/yelp/data/test_score_rev.xlsx")
+    frames = parse_excel_by_class("/Users/jaewooklee/farmers_market/yelp/data/test_score_rev.xlsx")
     for x in frames:
         x.Label.replace(0, 1, inplace=True)
 
@@ -270,6 +279,11 @@ def get_all_score():
                     qual.append(sen)
                 elif label == SAFETY:
                     safety.append(sen)
+
+            write_rev_per_asp(alias, 'avail', avail)
+            write_rev_per_asp(alias, 'environ', environ)
+            write_rev_per_asp(alias, 'qual', qual)
+            write_rev_per_asp(alias, 'safety', safety)
 
             avail_sc = count_possitive_reviews(avail, AVAIL, avail_pos_TFIDF, avail_neg_TFIDF)
             environ_sc = count_possitive_reviews(environ, ENVIRON, en_pos_TFIDF, en_neg_TFIDF)
