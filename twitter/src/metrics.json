@@ -1,0 +1,26 @@
+{
+    "SGD": {
+        "accuracy": 0.6143,
+        "f1": 0.6052,
+        "recall": 0.6143,
+        "precision": 0.6199
+    },
+    "LSVC": {
+        "accuracy": 0.5782,
+        "f1": 0.5758,
+        "recall": 0.5782,
+        "precision": 0.5811
+    },
+    "CNB": {
+        "accuracy": 0.595,
+        "f1": 0.588,
+        "recall": 0.595,
+        "precision": 0.5916
+    },
+    "LR": {
+        "accuracy": 0.5987,
+        "f1": 0.5927,
+        "recall": 0.5987,
+        "precision": 0.6067
+    }
+}
